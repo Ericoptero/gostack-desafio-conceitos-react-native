@@ -20,11 +20,52 @@ export default function App() {
   }, []);
 
   async function handleLikeRepository(id) {
-    const response = api.post(`/repositories/${id}/like`);
+    const response = await api.post(`/repositories/${id}/like`);
 
-    const repository = response.data;
+    const repositoryApiData = response.data;
 
-    setRepositories([...repositories, repository]);
+    const repositoryIndex = repositories.findIndex(
+      (repo) => repo.id === repositoryApiData.id
+    );
+
+    repositories[repositoryIndex] = repositoryApiData;
+
+    setRepositories([...repositories]);
+  }
+
+  function renderRepository({ item: repository }) {
+    return (
+      <>
+        <Text style={styles.repository}>{repository.title}</Text>
+
+        <View style={styles.techsContainer}>
+          {repository.techs.map((tech, index) => (
+            <Text style={styles.tech} key={index}>
+              {tech}
+            </Text>
+          ))}
+        </View>
+
+        <View style={styles.likesContainer}>
+          <Text
+            style={styles.likeText}
+            // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
+            testID={`repository-likes-${repository.id}`}
+          >
+            {repository.likes} curtidas
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleLikeRepository(repository.id)}
+          // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
+          testID={`like-button-${repository.id}`}
+        >
+          <Text style={styles.buttonText}>Curtir</Text>
+        </TouchableOpacity>
+      </>
+    );
   }
 
   return (
@@ -34,39 +75,8 @@ export default function App() {
         <FlatList
           style={styles.repositoryContainer}
           data={repositories}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item: repository }) => (
-            <>
-              <Text style={styles.repository}>{repository.title}</Text>
-
-              <View style={styles.techsContainer}>
-                {repository.techs.map((tech, index) => (
-                  <Text style={styles.tech} key={index}>
-                    {tech}
-                  </Text>
-                ))}
-              </View>
-
-              <View style={styles.likesContainer}>
-                <Text
-                  style={styles.likeText}
-                  // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                  testID={`repository-likes-${repository.id}`}
-                >
-                  {repository.likes} curtidas
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleLikeRepository(repository.id)}
-                // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-                testID={`like-button-${repository.id}`}
-              >
-                <Text style={styles.buttonText}>Curtir</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          keyExtractor={(repository) => repository.id}
+          renderItem={renderRepository}
         />
         <View></View>
       </SafeAreaView>
