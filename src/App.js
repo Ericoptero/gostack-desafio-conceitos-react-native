@@ -19,6 +19,9 @@ export default function App() {
     });
   }, []);
 
+  /**
+   * Função de Like para o repositório.
+   */
   async function handleLikeRepository(id) {
     const response = await api.post(`/repositories/${id}/like`);
 
@@ -33,6 +36,9 @@ export default function App() {
     setRepositories([...repositories]);
   }
 
+  /**
+   * Função de renderização da lista de repositórios.
+   */
   function renderRepository({ item: repository }) {
     return (
       <>
